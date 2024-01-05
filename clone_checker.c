@@ -1,11 +1,7 @@
-//
-//  clone_checker.c
-//
-//  To compile:
-//    gcc clone_checker.c -o clone_checker
-//
-//  Created by Dyorgio Nascimento on 2020-12-10.
-//
+/*
+Originally created by Dyorgio Nascimento on 2020-12-10.
+Modified for possum by anacrolix starting 2023-01-05, to determine block cloning in values file snapshots.
+*/
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +50,7 @@ int main(int args_count, char **args) {
   struct stat statB = check_file(filenameB, is_forced_mode);
 
   if (statA.st_dev != statB.st_dev || statA.st_size != statB.st_size || statA.st_size < 1
-      || statA.st_blocks != statB.st_blocks || statA.st_ino == statB.st_ino) {
+      || statA.st_ino == statB.st_ino) {
     // clones only are supported on same device and have same size em blocks count, a file cannot be a clone of itself
     fprintf(stdout,"0\n");
     exit(EXIT_SUCCESS);
@@ -147,6 +143,7 @@ int compare_blocks(int block_size, char *filenameA, char *filenameB, int fdA, in
       return -1;
     }
 
+    fprintf(stderr, "%lld %lld\n", physA.l2p_devoffset, physB.l2p_devoffset);
     if ( physA.l2p_devoffset != physB.l2p_devoffset ) {
       // found a diff block
       break;
